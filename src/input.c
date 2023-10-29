@@ -29,3 +29,12 @@ Board *getBoard(char *filename){
 
     return board;
 }
+
+void printMatrix(Board *board){
+    for (uint l = 0; l < board->L; l++){
+        for (uint c = 0; c < board->C; c++){
+            printf("%i ", board->matrix[l][c]);
+        }
+        printf("\n");
+    }
+}
