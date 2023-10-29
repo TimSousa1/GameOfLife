@@ -18,9 +18,25 @@ int main(int argc, char **argv){
     if (!IsWindowReady()) exit(WINDOW_INIT_FAIL);
     SetWindowMonitor(MONITOR);
 
-    Board *board = getBoard(argv[1]);
-    if (!board) exit(FILE_READ_FAIL); // change later; mem leaks WILL happen
-    printMatrix(board);
+    int error = 0;
+    Board *board = getBoard(argv[1], &error);
+    if (!board) exit(FILE_READ_FAIL);
+    if (error == INVALID_FILE_HEADER){ // invalid header; board was malloc'd
+        free(board);
+        CloseWindow();
+        exit(error);
+    } else if (error == FILE_READ_FAIL) {
+        freeBoard(board);
+        CloseWindow();
+        exit(error);
+    } else if (error == MATRIX_ALLOC_FAIL){
+        free(board->matrix);
+        free(board);
+        CloseWindow();
+        exit(error);
+    }
+
+    printMatrix(board, 1);
     
     SetTargetFPS(1);
     // start game rendering
