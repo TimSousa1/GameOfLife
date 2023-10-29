@@ -9,7 +9,7 @@
 #define C 3
 
 int main(int argc, char **argv){
-    if (argc != 2) exit(INVALID_ARGUMENTS_ERROR);
+    if (argc < 2) exit(INVALID_ARGUMENTS_ERROR);
 
     int width = GetMonitorWidth(MONITOR);
     int height = GetMonitorHeight(MONITOR);
@@ -20,31 +20,25 @@ int main(int argc, char **argv){
 
     int error = 0;
     Board *board = getBoard(argv[1], &error);
-    if (!board) exit(FILE_READ_FAIL);
-    if (error == INVALID_FILE_HEADER){ // invalid header; board was malloc'd
-        free(board);
-        CloseWindow();
-        exit(error);
-    } else if (error == FILE_READ_FAIL) {
-        freeBoard(board);
-        CloseWindow();
-        exit(error);
-    } else if (error == MATRIX_ALLOC_FAIL){
-        free(board->matrix);
-        free(board);
-        CloseWindow();
-        exit(error);
-    }
-
+    if (!board) exit(error);
     printMatrix(board, 1);
+
+    Board *nextBoard = copyBoard(NULL, board);
+    printMatrix(nextBoard, 1);
+    int fps = 1;
     
     SetTargetFPS(1);
-    // start game rendering
+    // start game loop
     while (!WindowShouldClose()){
-        ClearBackground(WHITE);
+        if (IsKeyPressed(KEY_UP)) SetTargetFPS(fps++);
+        if (IsKeyPressed(KEY_DOWN) && fps > 1) SetTargetFPS(fps--);
 
+        copyBoard(board, nextBoard);
+
+        ClearBackground(WHITE);
         BeginDrawing();
-            DrawMatrix(board);
+            DrawMatrix(nextBoard);
+            updateBoard(board, nextBoard);
         EndDrawing();
     }
     return 0;
