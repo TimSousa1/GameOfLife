@@ -18,9 +18,10 @@ typedef struct _board {
 } Board;
 
 // matrix info
-Board *getBoard(char *filename); // get a board from a file
-void printMatrix(Board *);       // print matrix to the terminal
+Board *getBoard(char *filename);          // get a board from a file
+void printMatrix(Board *, bool show_all); // print matrix to the terminal, show_all to show the whole matrix or just the scanned area
 
 // rendering
-void DrawMatrix(Board *); // render matrix on the screen
+void DrawMatrix(Board *);                                 // render matrix on the screen
+float convert(float, Vector2 oldRange, Vector2 newRange); // convert a value from a range to another
 

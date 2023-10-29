@@ -20,7 +20,9 @@ int main(int argc, char **argv){
 
     Board *board = getBoard(argv[1]);
     if (!board) exit(FILE_READ_FAIL); // change later; mem leaks WILL happen
+    printMatrix(board);
     
+    SetTargetFPS(1);
     // start game rendering
     while (!WindowShouldClose()){
         ClearBackground(WHITE);
