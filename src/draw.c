@@ -24,6 +24,20 @@ void DrawMatrix(Board *board){
     }
 }
 
+void mouseCellForce(Board *board){
+    Vector2 pos = GetMousePosition();
+    int posx, posy;
+
+    int screenW, screenH;
+    screenW = GetRenderWidth();
+    screenH = GetRenderHeight();
+
+    posx = convert(pos.x, (Vector2) {0, screenW}, (Vector2) {0, board->size.x});
+    posy = convert(pos.y, (Vector2) {0, screenH}, (Vector2) {0, board->size.y});
+
+    board->matrix[posy][posx] = 1;
+}
+
 float convert(float conv, Vector2 init, Vector2 final){
     float idelta, fdelta, ret;
     idelta = init.y - init.x;

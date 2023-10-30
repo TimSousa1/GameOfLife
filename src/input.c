@@ -5,7 +5,7 @@
 #include <raylib.h>
 #include "gameoflife.h"
 
-Board *getBoard(char *filename, int *error){
+Board *getBoard(char *filename, int *error, Board *board){
     *error = 0;
     FILE *input = fopen(filename, "r");
     if (!input) {
@@ -13,37 +13,43 @@ Board *getBoard(char *filename, int *error){
         return NULL;
     };
 
-    Board *board = (Board*) malloc (sizeof(*board));
-    if (!board) {
-        *error = MATRIX_ALLOC_FAIL;
-        freeBoard(board);
-        return NULL;
+    uint L, C;
+
+    if (!board){
+        board = (Board*) malloc (sizeof(*board));
+        if (!board) {
+            *error = MATRIX_ALLOC_FAIL;
+            freeBoard(board);
+            return NULL;
+        }
     }
-    board->matrix = NULL;
 
     int read_state;
-    read_state = fscanf(input, "%i %i %f %f", &board->L, &board->C, &board->size.x, &board->size.y);
+    read_state = fscanf(input, "%i %i %f %f", &C, &L, &board->size.x, &board->size.y);
     if (read_state != 4) {
         *error = INVALID_FILE_HEADER;
         freeBoard(board);
         return NULL;
-    };
-
-    board->matrix = (bool**) calloc (board->size.y, sizeof(bool*));
-    if (!board->matrix) {
-        *error = MATRIX_ALLOC_FAIL;
-        freeBoard(board);
-        return NULL;
     }
 
+    if (!board->matrix){
+        board->matrix = (bool**) calloc (board->size.y, sizeof(bool*));
+        if (!board->matrix) {
+            *error = MATRIX_ALLOC_FAIL;
+            freeBoard(board);
+            return NULL;
+        }
+    }
     int temp; // for bool conversion; bool type size is implementation dependant
     for (uint l = 0; l < board->size.y && !*error; l++){
-        board->matrix[l] = (bool*) calloc (board->size.x, sizeof(bool));
         if (!board->matrix[l]){
-            *error = MATRIX_ALLOC_FAIL;
+            board->matrix[l] = (bool*) calloc (board->size.x, sizeof(bool));
+            if (!board->matrix[l]){
+                *error = MATRIX_ALLOC_FAIL;
+            }
         }
         for (uint c = 0; c < board->size.x && !*error; c++){
-            if (c >= board->C || l >= board->L) {
+            if (c >= C || l >= L) {
                 board->matrix[l][c] = 0;
                 continue;
             }
@@ -65,16 +71,28 @@ Board *getBoard(char *filename, int *error){
 Board *copyBoard(Board *copy, Board *toCopy){
     if (!copy) {
         copy = (Board*) malloc (sizeof(*copy));
+        if (!copy) {
+            free(copy);
+            return NULL;
+        }
         copy->matrix = (bool**) calloc (toCopy->size.y, sizeof(bool*));
+        if (!copy->matrix) {
+            free(copy->matrix);
+            free(copy);
+            return NULL;
+        }
     }
 
-    copy->C = toCopy->C;
-    copy->L = toCopy->L;
     copy->size = toCopy->size;
 
-
     for (uint l = 0; l < copy->size.y; l++){
-        if (!copy->matrix[l]) copy->matrix[l] = (bool*) calloc (copy->size.x, sizeof(bool));
+        if (!copy->matrix[l]) {
+            copy->matrix[l] = (bool*) calloc (copy->size.x, sizeof(bool));
+            if (!copy->matrix[l]){
+                freeBoard(copy);
+                return NULL;
+            }
+        }
         for (uint c = 0; c < copy->size.x; c++){
             copy->matrix[l][c] = toCopy->matrix[l][c];
         }
@@ -83,14 +101,11 @@ Board *copyBoard(Board *copy, Board *toCopy){
     return copy;
 }
 
-void printMatrix(Board *board, bool show_all){
+void printMatrix(Board *board){
     uint L, C;
-    L = board->L;
-    C = board->C;
-    if (show_all) {
-        L = board->size.y;
-        C = board->size.x;
-    }
+    L = board->size.y;
+    C = board->size.x;
+
     for (uint l = 0; l < L; l++){
         for (uint c = 0; c < C; c++){
             printf("%i ", board->matrix[l][c]);
