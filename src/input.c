@@ -6,12 +6,16 @@
 #include "gameoflife.h"
 
 Board *getBoard(char *filename, int *error, Board *board){
+    FILE *input = NULL;
     *error = 0;
-    FILE *input = fopen(filename, "r");
-    if (!input) {
-        *error = FILE_READ_FAIL;
-        return NULL;
-    };
+
+    if (filename){
+        input = fopen(filename, "r");
+        if (!input) {
+            *error = FILE_READ_FAIL;
+            return NULL;
+        };
+    }
 
     uint L, C;
 
@@ -25,11 +29,18 @@ Board *getBoard(char *filename, int *error, Board *board){
     }
 
     int read_state;
-    read_state = fscanf(input, "%i %i %f %f", &C, &L, &board->size.x, &board->size.y);
-    if (read_state != 4) {
-        *error = INVALID_FILE_HEADER;
-        freeBoard(board);
-        return NULL;
+    if (filename){
+        read_state = fscanf(input, "%i %i %f %f", &C, &L, &board->size.x, &board->size.y);
+        if (read_state != 4) {
+            *error = INVALID_FILE_HEADER;
+            freeBoard(board);
+            return NULL;
+        }
+    } else {
+        C = 0;
+        L = 0;
+        board->size.x = 160;
+        board->size.y = 90;
     }
 
     if (!board->matrix){

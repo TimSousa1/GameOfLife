@@ -28,7 +28,7 @@ int resetGameState(Board *board, Board *nextBoard, char *filename, int *error); 
 void mouseCellForce(Board *);                                                   // sets a cell to 1 at mouse position
 
 // matrix info
-Board *getBoard(char *filename, int *error, Board*); // get a board from a file, if a board is specified, then that pointer will be used to store the info
+Board *getBoard(char *filename, int *error, Board*); // get a board from a file, if a board is specified, then that pointer will be used to store the info, if filename is NULL a default board will be created
 void printMatrix(Board*);                            // print matrix to the terminal
 
 // rendering

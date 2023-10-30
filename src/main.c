@@ -9,7 +9,9 @@
 #define FPS_PAUSE 500
 
 int main(int argc, char **argv){
-    if (argc < 2) exit(INVALID_ARGUMENTS_ERROR);
+    char *filename = NULL;
+    if (argc == 2) filename = argv[1];
+    else if (argc > 2) exit(INVALID_ARGUMENTS_ERROR);
 
     int width = GetMonitorWidth(MONITOR);
     int height = GetMonitorHeight(MONITOR);
@@ -19,7 +21,8 @@ int main(int argc, char **argv){
     SetWindowMonitor(MONITOR);
 
     int error = 0;
-    Board *board = getBoard(argv[1], &error, NULL);
+    Board *board = NULL;
+    board = getBoard(filename, &error, NULL);
     if (!board) exit(error);
 
     Board *nextBoard = copyBoard(NULL, board);
