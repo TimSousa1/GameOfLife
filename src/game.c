@@ -44,3 +44,11 @@ int countNeighbours(Board *board, Vector2 pos){
     return count;
 }
 
+int resetGameState(Board *board, Board *nextBoard, char *filename, int *error){
+    board = getBoard(filename, error, board);
+    if (!board) return *error;
+
+    nextBoard = copyBoard(nextBoard, board);
+    if (!nextBoard) return MATRIX_ALLOC_FAIL;
+    return 0;
+}

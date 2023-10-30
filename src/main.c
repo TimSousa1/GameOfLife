@@ -5,8 +5,8 @@
 #include <raylib.h>
 #include "gameoflife.h"
 
-#define L 3
-#define C 3
+#define FPS 15
+#define FPS_PAUSE 500
 
 int main(int argc, char **argv){
     if (argc < 2) exit(INVALID_ARGUMENTS_ERROR);
@@ -19,28 +19,43 @@ int main(int argc, char **argv){
     SetWindowMonitor(MONITOR);
 
     int error = 0;
-    Board *board = getBoard(argv[1], &error);
+    Board *board = getBoard(argv[1], &error, NULL);
     if (!board) exit(error);
-    printMatrix(board, 1);
 
     Board *nextBoard = copyBoard(NULL, board);
-    printMatrix(nextBoard, 1);
-    int fps = 1;
+    int fps = FPS;
     
-    SetTargetFPS(1);
+    SetTargetFPS(FPS);
+    int reset_status;
+    bool game_is_paused = 0;
     // start game loop
     while (!WindowShouldClose()){
         if (IsKeyPressed(KEY_UP)) SetTargetFPS(fps++);
         if (IsKeyPressed(KEY_DOWN) && fps > 1) SetTargetFPS(fps--);
+        if (IsKeyPressed(KEY_R)) {
+            reset_status = resetGameState(board, nextBoard, argv[1], &error);
+            if (reset_status) break;
+        }
+        if (IsKeyPressed(KEY_SPACE)) {
+            game_is_paused = !game_is_paused;
+            if (game_is_paused) SetTargetFPS(FPS_PAUSE);
+            else SetTargetFPS(fps);
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) mouseCellForce(nextBoard);
 
         copyBoard(board, nextBoard);
+        if (!board) break;
 
         ClearBackground(WHITE);
         BeginDrawing();
             DrawMatrix(nextBoard);
+            if (!game_is_paused)
             updateBoard(board, nextBoard);
         EndDrawing();
     }
+    freeBoard(board);
+    freeBoard(nextBoard);
+
     return 0;
 }
 
