@@ -28,10 +28,11 @@ int main(int argc, char **argv){
     Board *nextBoard = copyBoard(NULL, board);
     int fps = FPS;
     
-    SetTargetFPS(FPS);
     int reset_status;
     int save_status;
-    bool game_is_paused = 0;
+    bool game_is_paused = 1;
+    SetTargetFPS(FPS);
+    if (game_is_paused) SetTargetFPS(FPS_PAUSE);
     // start game loop
     while (!WindowShouldClose()){
         save_status = 0;
