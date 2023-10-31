@@ -3,6 +3,7 @@ Conway's Game of Life in C with raylib
 
 ### Controls
 R to reset\
+S to save to file\
 SPACE to pause\
 left click to draw
 
