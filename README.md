@@ -1,22 +1,34 @@
+
 # GameOfLife
 Conway's Game of Life in C with raylib
 
 ### Controls
+
 R to reset\
 S to save to file\
 SPACE to pause\
 left click to draw
 
 ### Installation
-GameOfLife dependes on raylib to work.
+
+GameOfLife depends on raylib to work.
+
 #### Arch Linux
+
 `$ sudo pacman -S raylib`\
 `$ make` inside the build folder
 
+#### Building from source
+
+Of course, raylib can be [built from source](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux).
+
 ### Running
+
 `$ ./gameoflife <options>`\
 A file containing a board can be specified to be loaded, otherwise an empty canvas of 160x90 will be used as the default.
+
 #### File format
+
 The file format should be:
 ```
 C L sizex sizey
