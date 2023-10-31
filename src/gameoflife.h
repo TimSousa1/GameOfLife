@@ -26,6 +26,7 @@ int countNeighbours(Board *board, Vector2 pos);                                 
 void updateBoard(Board *original, Board* newBoard);                             // iterate the board through one cycle
 int resetGameState(Board *board, Board *nextBoard, char *filename, int *error); // resets the game, rereads the input file
 void mouseCellForce(Board *);                                                   // sets a cell to 1 at mouse position
+int saveBoardToFile(char *outfilename, Board *);                                // write the specified board to a file named outfilename
 
 // matrix info
 Board *getBoard(char *filename, int *error, Board*); // get a board from a file, if a board is specified, then that pointer will be used to store the info, if filename is NULL a default board will be created
