@@ -30,19 +30,25 @@ int main(int argc, char **argv){
     
     SetTargetFPS(FPS);
     int reset_status;
+    int save_status;
     bool game_is_paused = 0;
     // start game loop
     while (!WindowShouldClose()){
+        save_status = 0;
         if (IsKeyPressed(KEY_UP)) SetTargetFPS(fps++);
         if (IsKeyPressed(KEY_DOWN) && fps > 1) SetTargetFPS(fps--);
         if (IsKeyPressed(KEY_R)) {
             reset_status = resetGameState(board, nextBoard, argv[1], &error);
             if (reset_status) break;
         }
-        if (IsKeyPressed(KEY_SPACE)) {
+        if (IsKeyPressed(KEY_SPACE)){
             game_is_paused = !game_is_paused;
             if (game_is_paused) SetTargetFPS(FPS_PAUSE);
             else SetTargetFPS(fps);
+        }
+        if (IsKeyPressed(KEY_S)) {
+            save_status = saveBoardToFile("../saved/test1.golboard", nextBoard);
+            if (save_status) printf("error saving file! (STATUS %i)\n", save_status);
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) mouseCellForce(nextBoard);
 

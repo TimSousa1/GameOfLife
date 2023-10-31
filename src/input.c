@@ -76,6 +76,7 @@ Board *getBoard(char *filename, int *error, Board *board){
         freeBoard(board);
         return NULL;
     }
+    if (filename) fclose(input);
     return board;
 }
 
@@ -123,6 +124,32 @@ void printMatrix(Board *board){
         }
         printf("\n");
     }
+}
+
+int saveBoardToFile(char *filename, Board *board){
+    FILE *saveFile = NULL;
+    int write_status = 0;
+
+    saveFile = fopen(filename, "w");
+    if (!saveFile) {
+        perror("Error");
+        return 1;
+    }
+
+    write_status = fprintf(saveFile, "%i %i %i %i\n", (int) board->size.x, (int) board->size.y, (int) board->size.x, (int) board->size.y);
+    if (write_status < 4) return 2;
+
+    for (uint l = 0; l < (uint) board->size.y; l++){
+        for (uint c = 0; c < (uint) board->size.x; c++){
+            write_status = fprintf(saveFile, "%i ", board->matrix[l][c]);
+            if (write_status < 1) return 3;
+        }
+        write_status = fprintf(saveFile, "\n");
+        if (write_status < 1) return 3;
+    }
+
+    fclose(saveFile);
+    return 0;
 }
 
 void freeBoard(Board *board){
