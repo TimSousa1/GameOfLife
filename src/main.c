@@ -21,6 +21,7 @@ int main(int argc, char **argv){
     InitWindow(width, height, "Game Of Life");
     if (!IsWindowReady()) exit(WINDOW_INIT_FAIL);
     SetWindowMonitor(MONITOR);
+    SetExitKey(KEY_RIGHT_CONTROL); // force quit key
 
     int error = 0;
     Board *board = NULL;
@@ -43,20 +44,20 @@ int main(int argc, char **argv){
     // start game loop
     while (!WindowShouldClose()){
         save_status = 0;
-        if (!saving && IsKeyPressed(KEY_UP)) SetTargetFPS(fps++);
-        if (!saving && IsKeyPressed(KEY_DOWN) && fps > 1) SetTargetFPS(fps--);
-        if (!saving && IsKeyPressed(KEY_R)) {
+        if (!saving && IsKeyPressed(KEY_ESCAPE)) break; // close
+        if (!saving && IsKeyPressed(KEY_UP)) SetTargetFPS(fps++); // speed up
+        if (!saving && IsKeyPressed(KEY_DOWN) && fps > 1) SetTargetFPS(fps--); // speed down
+        if (!saving && IsKeyPressed(KEY_R)) { // reload file
             reset_status = resetGameState(board, nextBoard, argv[1], &error);
             if (reset_status) break;
         }
-        if (!saving && IsKeyPressed(KEY_SPACE)){
+        if (!saving && IsKeyPressed(KEY_SPACE)){ // pause
             game_is_paused = !game_is_paused;
             if (game_is_paused) SetTargetFPS(FPS_PAUSE);
             else SetTargetFPS(fps);
         }
-        if (!saving && IsKeyPressed(KEY_S)) {
-            saving = 1;
-        }
+        // saving to file
+        if (!saving && IsKeyPressed(KEY_S)) saving = 1;
         if (saving){
             key = GetCharPressed();
             DrawText(saveName, GetRenderWidth()/2, GetRenderHeight()/2, 50, BLACK);
@@ -81,12 +82,20 @@ int main(int argc, char **argv){
                 char_count *= char_count >= 0;
                 saveName[char_count] = '\0';
             }
+            if (IsKeyPressed(KEY_ESCAPE)){
+                char_count = 0;
+                saveName[0] = '\0';
+                saving = 0;
+            }
         }
+
+        // drawing
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) mouseCellForce(nextBoard);
 
         copyBoard(board, nextBoard);
         if (!board) break;
 
+        // rendering
         ClearBackground(WHITE);
         BeginDrawing();
             DrawMatrix(nextBoard);
