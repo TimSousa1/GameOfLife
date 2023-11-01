@@ -8,6 +8,8 @@
 #define FPS 15
 #define FPS_PAUSE 500
 
+#define CHAR_LIM 20
+
 int main(int argc, char **argv){
     char *filename = NULL;
     if (argc == 2) filename = argv[1];
@@ -33,23 +35,52 @@ int main(int argc, char **argv){
     bool game_is_paused = 1;
     SetTargetFPS(FPS);
     if (game_is_paused) SetTargetFPS(FPS_PAUSE);
+    char saveName[CHAR_LIM + 1];
+    int char_count = 0;
+    bool saving = 0;
+    int key;
+
     // start game loop
     while (!WindowShouldClose()){
         save_status = 0;
-        if (IsKeyPressed(KEY_UP)) SetTargetFPS(fps++);
-        if (IsKeyPressed(KEY_DOWN) && fps > 1) SetTargetFPS(fps--);
-        if (IsKeyPressed(KEY_R)) {
+        if (!saving && IsKeyPressed(KEY_UP)) SetTargetFPS(fps++);
+        if (!saving && IsKeyPressed(KEY_DOWN) && fps > 1) SetTargetFPS(fps--);
+        if (!saving && IsKeyPressed(KEY_R)) {
             reset_status = resetGameState(board, nextBoard, argv[1], &error);
             if (reset_status) break;
         }
-        if (IsKeyPressed(KEY_SPACE)){
+        if (!saving && IsKeyPressed(KEY_SPACE)){
             game_is_paused = !game_is_paused;
             if (game_is_paused) SetTargetFPS(FPS_PAUSE);
             else SetTargetFPS(fps);
         }
-        if (IsKeyPressed(KEY_S)) {
-            save_status = saveBoardToFile("../saved/test1.golboard", nextBoard);
-            if (save_status) printf("error saving file! (STATUS %i)\n", save_status);
+        if (!saving && IsKeyPressed(KEY_S)) {
+            saving = 1;
+        }
+        if (saving){
+            key = GetCharPressed();
+            DrawText(saveName, GetRenderWidth()/2, GetRenderHeight()/2, 50, BLACK);
+            if (key > 0 && char_count <= CHAR_LIM){;
+
+                saveName[char_count] = (char) key;
+                char_count++;
+                saveName[char_count] = '\0';
+
+            }
+            if (IsKeyPressed(KEY_ENTER)){
+                printf("saving to %s\n", saveName);
+                save_status = saveBoardToFile(saveName, nextBoard);
+                if (save_status) printf("error saving file! (ERROR %i)\n", save_status);
+
+                char_count = 0;
+                saveName[0] = '\0';
+                saving = 0;
+            }
+            if (IsKeyPressed(KEY_BACKSPACE)){
+                char_count--;
+                char_count *= char_count >= 0;
+                saveName[char_count] = '\0';
+            }
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) mouseCellForce(nextBoard);
 
@@ -60,7 +91,7 @@ int main(int argc, char **argv){
         BeginDrawing();
             DrawMatrix(nextBoard);
             if (!game_is_paused)
-            updateBoard(board, nextBoard);
+                updateBoard(board, nextBoard);
         EndDrawing();
     }
     freeBoard(board);

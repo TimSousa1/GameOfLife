@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <raylib.h>
 #include "gameoflife.h"
@@ -130,7 +131,14 @@ int saveBoardToFile(char *filename, Board *board){
     FILE *saveFile = NULL;
     int write_status = 0;
 
-    saveFile = fopen(filename, "w");
+    char extension[] = ".golboard";
+    char directory[] = "../saved/";
+    char *outFilename = (char*) malloc((strlen(directory) + strlen(extension) + strlen(filename)) * sizeof(char));
+    strcpy(outFilename, directory);
+    strcat(outFilename, filename);
+    strcat(outFilename, extension);
+
+    saveFile = fopen(outFilename, "w");
     if (!saveFile) {
         perror("Error");
         return 1;
