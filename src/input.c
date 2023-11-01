@@ -156,6 +156,7 @@ int saveBoardToFile(char *filename, Board *board){
         if (write_status < 1) return 3;
     }
 
+    free(outFilename);
     fclose(saveFile);
     return 0;
 }
