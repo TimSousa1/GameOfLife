@@ -24,7 +24,6 @@ Board *getBoard(char *filename, int *error, Board *board){
         board = (Board*) malloc (sizeof(*board));
         if (!board) {
             *error = MATRIX_ALLOC_FAIL;
-            freeBoard(board);
             return NULL;
         }
     }
@@ -34,7 +33,7 @@ Board *getBoard(char *filename, int *error, Board *board){
         read_state = fscanf(input, "%i %i %f %f", &C, &L, &board->size.x, &board->size.y);
         if (read_state != 4) {
             *error = INVALID_FILE_HEADER;
-            freeBoard(board);
+            free(board);
             return NULL;
         }
     } else {

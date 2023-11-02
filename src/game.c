@@ -21,25 +21,30 @@ void updateBoard(Board *oldBoard, Board *newBoard){
 // there has to be a better way to do this
 int countNeighbours(Board *board, Vector2 pos){
     int count = 0;
-    bool x0, xmax, y0, ymax;
 
-    x0 = (pos.x -1 > 0);
-    y0 = (pos.y -1 > 0);
-    xmax = (pos.x +1 < board->size.x);
-    ymax = (pos.y +1 < board->size.y);
+    // all possible neighbour positions
+    int mvx[] = {-1, 1, 0};
+    int mvy[] = {-1, 1, 0};
 
-    if (ymax){
-        count += board->matrix[(int) pos.y +1][(int) pos.x];
-        if (x0) count += board->matrix[(int) pos.y +1][(int) pos.x -1];
-        if (xmax) count += board->matrix[(int) pos.y +1][(int) pos.x +1];
+    int posx, posy;
+    int max_i, max_j;
+
+    max_i = 3;
+    max_j = 3;
+
+    // running for all possible neighbours
+    for (ushort i = 0; i < max_i; i++){
+        posx = pos.x + mvx[i];
+        if (i == 2) max_j = 2; // avoiding checking for 0, 0
+        for (ushort j = 0; j < max_j; j++){
+
+            posy = pos.y + mvy[j];
+            if (posx < 0 || posx >= board->size.x 
+                    || posy < 0 || posy >= board->size.y) continue;
+
+            count += board->matrix[(int) posy][(int) posx];
+        }
     }
-    if (y0){
-        count += board->matrix[(int) pos.y -1][(int) pos.x];
-        if (x0) count += board->matrix[(int) pos.y -1][(int) pos.x -1];
-        if (xmax) count += board->matrix[(int) pos.y -1][(int) pos.x +1];
-    }
-    if (xmax) count += board->matrix[(int) pos.y][(int) pos.x +1];
-    if (x0) count += board->matrix[(int) pos.y][(int) pos.x -1];
 
     return count;
 }
